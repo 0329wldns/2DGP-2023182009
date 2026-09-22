@@ -7,6 +7,9 @@ boy = load_image('character.png')
 
 def move_circle():
     print('circle')
+    clear_canvas()
+    boy.draw(400, 300)
+    update_canvas()
     pass
 
 def move_rectangle():
