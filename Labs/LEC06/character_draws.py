@@ -3,6 +3,8 @@ from pico2d import *
 
 open_canvas(800, 600)
 
+boy = load_image('character.png')
+
 def move_circle():
     print('circle')
     pass
