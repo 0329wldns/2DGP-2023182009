@@ -40,7 +40,6 @@ def move_left_side():
         x += speed * 6.25
         y += speed * 6.25
         draw_boy(x, y)
-        print(x, y)
     pass
 
 def move_right_side():
