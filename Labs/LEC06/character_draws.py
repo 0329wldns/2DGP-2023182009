@@ -42,8 +42,8 @@ def move_left_side():
     x = 50
     y = 50
     while x < 300:
-        x += speed * 12.5
-        y += speed * 12.5
+        x += speed * 6.25
+        y += speed * 6.25
         draw_boy(x, y)
         print(x, y)
     pass
@@ -53,8 +53,8 @@ def move_right_side():
     x = 300
     y = 300
     while x < 550:
-        x += speed * 12.5
-        y -= speed * 12.5
+        x += speed * 6.25
+        y -= speed * 6.25
         draw_boy(x, y)
     pass
 
