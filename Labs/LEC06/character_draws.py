@@ -57,8 +57,8 @@ def move_right_side():
 def move_circle():
     for degree in range(0, 360, speed * 2):
         theta = math.radians(degree + 180)
-        x = 400 + 200 * math.sin(theta)
-        y = 300 + 200 * math.cos(theta)
+        x = screen_width / 2 + 200 * math.sin(theta)
+        y = screen_height / 2 + 200 * math.cos(theta)
 
         draw_boy(x, y)
 
