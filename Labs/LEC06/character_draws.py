@@ -52,7 +52,7 @@ def move_right_side():
     pass
 
 def move_circle():
-    for degree in range(0, 360, speed):
+    for degree in range(0, 360, speed * 2):
         theta = math.radians(degree)
         x = 400 + 200 * math.sin(theta)
         y = 300 + 200 * math.cos(theta)
