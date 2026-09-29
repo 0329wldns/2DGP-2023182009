@@ -15,30 +15,25 @@ def draw_boy(x, y):
     delay(0.01)
 
 def move_top():
-    print('TOP')
     for x in range(50, 551, speed * 10):
         draw_boy(x, 550)
 
 def move_right():
-    print('RIGHT')
     for y in range(550, 49, -speed * 10):
         draw_boy(550, y)
     pass
 
 def move_bottom():
-    print('BOTTOM')
     for x in range(550, 49, -speed * 10):
         draw_boy(x, 50)
     pass
 
 def move_left():
-    print('LEFT')
     for y in range(50, 551, speed * 10):
         draw_boy(50, y)
     pass
 
 def move_left_side():
-    print('left_side')
     x = 50
     y = 50
     while x < 300:
@@ -49,7 +44,6 @@ def move_left_side():
     pass
 
 def move_right_side():
-    print('right_side')
     x = 300
     y = 300
     while x < 550:
@@ -67,7 +61,6 @@ def move_circle():
         draw_boy(x, y)
 
 def move_rectangle():
-    print('rectangle')
     move_top()
     move_right()
     move_bottom()
@@ -75,7 +68,6 @@ def move_rectangle():
     pass
 
 def move_triangle():
-    print('triangle')
     move_bottom()
     move_left_side()
     move_right_side()
