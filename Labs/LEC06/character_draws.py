@@ -38,9 +38,11 @@ def move_left():
     pass
 
 def move_left_side():
+    print('left_side')
     pass
 
 def move_right_side():
+    print('right_side')
     pass
 
 def move_circle():
