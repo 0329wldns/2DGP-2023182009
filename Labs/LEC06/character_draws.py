@@ -5,7 +5,7 @@ open_canvas(800, 600)
 
 boy = load_image('character.png')
 
-speed = 3
+speed = 2
 
 # 0.01초의 딜레이를 두고 넘겨준 좌표에 캐릭터를 그림
 def draw_boy(x, y):
@@ -45,10 +45,17 @@ def move_left_side():
         x += speed * 10
         y += speed * 10
         draw_boy(x, y)
+        print(x, y)
     pass
 
 def move_right_side():
     print('right_side')
+    x = 300
+    y = 300
+    while x < 550:
+        x += speed * 10
+        y -= speed * 10
+        draw_boy(x, y)
     pass
 
 def move_circle():
