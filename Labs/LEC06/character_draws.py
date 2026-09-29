@@ -55,10 +55,13 @@ def move_rectangle():
 
 def move_triangle():
     print('triangle')
+    move_bottom()
+    # move_left_side()
+    # move_right_side()
     pass
 
 while True:
     # move_circle()
-    move_rectangle()
+    # move_rectangle()
     move_triangle()
     break
