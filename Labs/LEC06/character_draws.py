@@ -33,6 +33,8 @@ def move_bottom():
 
 def move_left():
     print('LEFT')
+    for y in range(50, 551, speed * 10):
+        draw_boy(50, y)
     pass
 
 def move_circle():
