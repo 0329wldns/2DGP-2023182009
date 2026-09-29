@@ -9,7 +9,11 @@ speed = 3
 
 def move_top():
     print('TOP')
-    pass
+    for x in range(50, 751, speed * 10):
+        clear_canvas()
+        boy.draw(x, 550)
+        update_canvas()
+        delay(0.01)
 
 def move_right():
     print('RIGHT')
@@ -47,7 +51,7 @@ def move_triangle():
     pass
 
 while True:
-    move_circle()
+    # move_circle()
     move_rectangle()
     move_triangle()
-    pass
+    break
