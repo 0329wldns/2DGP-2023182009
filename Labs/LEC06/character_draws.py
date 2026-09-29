@@ -7,6 +7,18 @@ boy = load_image('character.png')
 
 speed = 3
 
+def move_top():
+    pass
+
+def move_right():
+    pass
+
+def move_bottom():
+    pass
+
+def move_left():
+    pass
+
 def move_circle():
     for degree in range(0, 360, speed):
         theta = math.radians(degree)
@@ -20,6 +32,10 @@ def move_circle():
 
 def move_rectangle():
     print('rectangle')
+    move_top()
+    move_right()
+    move_bottom()
+    move_left()
     pass
 
 def move_triangle():
