@@ -1,7 +1,10 @@
 # 실습 과제 진행
 from pico2d import *
 
-open_canvas(800, 600)
+screen_width = 800
+screen_height = 600
+
+open_canvas(screen_width, screen_height)
 
 boy = load_image('character.png')
 
