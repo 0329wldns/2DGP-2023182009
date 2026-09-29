@@ -7,13 +7,17 @@ boy = load_image('character.png')
 
 speed = 3
 
+# 0.01초의 딜레이를 두고 넘겨준 좌표에 캐릭터를 그림
+def draw_boy(x, y):
+    clear_canvas()
+    boy.draw(x, y)
+    update_canvas()
+    delay(0.01)
+
 def move_top():
     print('TOP')
     for x in range(50, 751, speed * 10):
-        clear_canvas()
-        boy.draw(x, 550)
-        update_canvas()
-        delay(0.01)
+        draw_boy(x, 550)
 
 def move_right():
     print('RIGHT')
@@ -33,10 +37,7 @@ def move_circle():
         x = 400 + 200 * math.cos(theta)
         y = 300 + 200 * math.sin(theta)
 
-        clear_canvas()
-        boy.draw(x, y)
-        update_canvas()
-        delay(0.01)
+        draw_boy(x, y)
 
 def move_rectangle():
     print('rectangle')
@@ -51,7 +52,7 @@ def move_triangle():
     pass
 
 while True:
-    # move_circle()
+    move_circle()
     move_rectangle()
     move_triangle()
     break
