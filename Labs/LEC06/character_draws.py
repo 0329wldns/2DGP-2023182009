@@ -37,6 +37,12 @@ def move_left():
         draw_boy(50, y)
     pass
 
+def move_left_side():
+    pass
+
+def move_right_side():
+    pass
+
 def move_circle():
     for degree in range(0, 360, speed):
         theta = math.radians(degree)
@@ -56,8 +62,8 @@ def move_rectangle():
 def move_triangle():
     print('triangle')
     move_bottom()
-    # move_left_side()
-    # move_right_side()
+    move_left_side()
+    move_right_side()
     pass
 
 while True:
