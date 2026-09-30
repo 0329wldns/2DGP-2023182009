@@ -58,12 +58,14 @@ animations = [walk_frames, kick_frames, jump_frames, run_frames]
 animation_index = 0
 frame_count = len(animations[animation_index])
 animation_repeat = 0
-frame_scale = 8
+target_sprite_height = screen_height // 2
 frame = 0
 
 
 def draw_frame(frames, frame_index):
 	frame_left, frame_bottom, frame_width, frame_height = frames[frame_index]
+	draw_height = target_sprite_height
+	draw_width = frame_width * draw_height // frame_height
 
 	clear_canvas()
 	sprite_sheet.clip_draw(
@@ -73,8 +75,8 @@ def draw_frame(frames, frame_index):
 		frame_height,
 		screen_width // 2,
 		screen_height // 2,
-		frame_width * frame_scale,
-		frame_height * frame_scale,
+		draw_width,
+		draw_height,
 	)
 	update_canvas()
 	delay(1 / 24)
