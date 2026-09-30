@@ -54,7 +54,16 @@ run_frames = [
 	(218, 208, 38, 32),
 ]
 
-animations = [walk_frames, kick_frames, jump_frames, run_frames]
+spring_frames = [
+	(1, 154, 24, 41),
+	(31, 154, 29, 41),
+	(65, 154, 20, 41),
+	(90, 155, 25, 40),
+	(119, 155, 25, 40),
+	(149, 154, 20, 41),
+]
+
+animations = [walk_frames, kick_frames, jump_frames, run_frames, spring_frames]
 animation_index = 0
 frame_count = len(animations[animation_index])
 animation_repeat = 0
