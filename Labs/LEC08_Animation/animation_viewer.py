@@ -89,6 +89,8 @@ while running:
 			running = False
 
 	draw_frame(animations[animation_index], frame)
+	if animations[animation_index] is jump_frames and frame == frame_count - 1:
+		delay(2 / 24)
 	frame += 1
 	if frame == frame_count:
 		frame = 0
