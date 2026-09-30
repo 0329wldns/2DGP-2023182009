@@ -9,28 +9,38 @@ open_canvas(screen_width, screen_height)
 
 sprite_sheet = load_image(str(Path(__file__).with_name('sonic-sprite.png')))
 
-sprite_sheet_width = 399
-frame_height = 40
-frame_count = 12
-walk_row_bottom = 407
+walk_frames = [
+	(8, 408, 26, 37),
+	(36, 408, 28, 37),
+	(65, 407, 31, 38),
+	(97, 409, 37, 37),
+	(135, 411, 32, 35),
+	(170, 409, 32, 38),
+	(206, 409, 26, 38),
+	(238, 409, 24, 37),
+	(263, 409, 30, 37),
+	(295, 409, 36, 37),
+	(334, 410, 32, 36),
+	(370, 409, 29, 38),
+]
+frame_count = len(walk_frames)
+frame_scale = 8
 frame = 0
 
 
 def draw_frame(frame_index):
-	frame_left = frame_index * sprite_sheet_width // frame_count
-	frame_right = (frame_index + 1) * sprite_sheet_width // frame_count
-	frame_width = frame_right - frame_left
+	frame_left, frame_bottom, frame_width, frame_height = walk_frames[frame_index]
 
 	clear_canvas()
 	sprite_sheet.clip_draw(
 		frame_left,
-		walk_row_bottom,
+		frame_bottom,
 		frame_width,
 		frame_height,
 		screen_width // 2,
 		screen_height // 2,
-		300,
-		315,
+		frame_width * frame_scale,
+		frame_height * frame_scale,
 	)
 	update_canvas()
 	delay(0.12)
