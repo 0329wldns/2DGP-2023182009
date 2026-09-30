@@ -15,17 +15,11 @@ frame_count = 3
 second_row_bottom = frame_height * 3
 frame = 0
 
-running = True
-while running:
-	for event in get_events():
-		if event.type == SDL_QUIT:
-			running = False
-		elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-			running = False
 
+def draw_frame(frame_index):
 	clear_canvas()
 	sprite_sheet.clip_draw(
-		frame * frame_width,
+		frame_index * frame_width,
 		second_row_bottom,
 		frame_width,
 		frame_height,
@@ -35,8 +29,18 @@ while running:
 		300,
 	)
 	update_canvas()
-
-	frame = (frame + 1) % frame_count
 	delay(0.12)
+
+
+running = True
+while running:
+	for event in get_events():
+		if event.type == SDL_QUIT:
+			running = False
+		elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
+			running = False
+
+	draw_frame(frame)
+	frame = (frame + 1) % frame_count
 
 close_canvas()
