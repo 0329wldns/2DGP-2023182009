@@ -6,7 +6,7 @@ grass = load_image('grass.png')
 character = load_image('run_animation.png')
 
 # fill here
-
+print('test')
 
 close_canvas()
 
