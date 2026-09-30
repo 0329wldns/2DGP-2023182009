@@ -10,9 +10,9 @@ open_canvas(screen_width, screen_height)
 sprite_sheet = load_image(str(Path(__file__).with_name('sonic-sprite.png')))
 
 sprite_sheet_width = 399
-frame_height = 35
+frame_height = 40
 frame_count = 12
-walk_row_bottom = 420
+walk_row_bottom = 407
 frame = 0
 
 
