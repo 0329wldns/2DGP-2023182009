@@ -88,7 +88,7 @@ def draw_frame(frames, frame_index):
 		draw_height,
 	)
 	update_canvas()
-	delay(1 / 24)
+	delay(1 / 30 if frames is jump_frames else 1 / 24)
 
 
 running = True
@@ -101,7 +101,7 @@ while running:
 
 	draw_frame(animations[animation_index], frame)
 	if animations[animation_index] is jump_frames and frame == frame_count - 1:
-		delay(2 / 24)
+		delay(2 / 30)
 	frame += 1
 	if frame == frame_count:
 		frame = 0
