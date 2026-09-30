@@ -23,13 +23,26 @@ walk_frames = [
 	(334, 410, 32, 36),
 	(370, 409, 29, 38),
 ]
-frame_count = len(walk_frames)
+
+jump_frames = [
+	(1, 361, 33, 40),
+	(39, 363, 35, 39),
+	(89, 363, 35, 38),
+	(129, 362, 35, 42),
+	(181, 363, 34, 41),
+	(225, 363, 36, 40),
+]
+
+animations = [walk_frames, jump_frames]
+animation_index = 0
+frame_count = len(animations[animation_index])
+animation_repeat = 0
 frame_scale = 8
 frame = 0
 
 
-def draw_frame(frame_index):
-	frame_left, frame_bottom, frame_width, frame_height = walk_frames[frame_index]
+def draw_frame(frames, frame_index):
+	frame_left, frame_bottom, frame_width, frame_height = frames[frame_index]
 
 	clear_canvas()
 	sprite_sheet.clip_draw(
@@ -54,7 +67,15 @@ while running:
 		elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
 			running = False
 
-	draw_frame(frame)
-	frame = (frame + 1) % frame_count
+	draw_frame(animations[animation_index], frame)
+	frame += 1
+	if frame == frame_count:
+		frame = 0
+		animation_repeat += 1
+		if animation_repeat == 5:
+			animation_repeat = 0
+			animation_index = (animation_index + 1) % len(animations)
+			frame_count = len(animations[animation_index])
+			delay(1.0)
 
 close_canvas()
