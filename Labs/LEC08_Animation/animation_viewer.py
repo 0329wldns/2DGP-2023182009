@@ -24,7 +24,7 @@ walk_frames = [
 	(370, 409, 29, 38),
 ]
 
-jump_frames = [
+kick_frames = [
 	(1, 361, 33, 40),
 	(39, 363, 35, 39),
 	(89, 363, 35, 38),
@@ -33,7 +33,19 @@ jump_frames = [
 	(225, 363, 36, 40),
 ]
 
-animations = [walk_frames, jump_frames]
+jump_frames = [
+	(1, 326, 29, 30),
+	(35, 327, 29, 31),
+	(67, 327, 30, 29),
+	(98, 327, 31, 29),
+	(131, 327, 29, 30),
+	(162, 326, 29, 31),
+	(193, 326, 30, 29),
+	(229, 326, 32, 29),
+	(267, 325, 31, 30),
+]
+
+animations = [walk_frames, kick_frames, jump_frames]
 animation_index = 0
 frame_count = len(animations[animation_index])
 animation_repeat = 0
