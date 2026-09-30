@@ -74,26 +74,26 @@ back_turn_frames = [
 	(254, 111, 33, 34),
 ]
 
-animations = [
-	walk_frames,
-	kick_frames,
-	jump_frames,
-	run_frames,
-	spring_frames,
-	back_turn_frames,
-]
 frame_rate = 24
 jump_frame_rate = 30
 animation_repeats = 5
 animation_pause = 1.0
+animation_configs = [
+	(walk_frames, frame_rate, 0),
+	(kick_frames, frame_rate, 0),
+	(jump_frames, jump_frame_rate, 2),
+	(run_frames, frame_rate, 0),
+	(spring_frames, frame_rate, 0),
+	(back_turn_frames, frame_rate, 0),
+]
 animation_index = 0
-frame_count = len(animations[animation_index])
+frame_count = len(animation_configs[animation_index][0])
 animation_repeat = 0
 target_sprite_height = screen_height // 2
 frame = 0
 
 
-def draw_frame(frames, frame_index):
+def draw_frame(frames, frame_index, frame_rate):
 	frame_left, frame_bottom, frame_width, frame_height = frames[frame_index]
 	draw_height = target_sprite_height
 	draw_width = frame_width * draw_height // frame_height
@@ -110,7 +110,7 @@ def draw_frame(frames, frame_index):
 		draw_height,
 	)
 	update_canvas()
-	delay(1 / (jump_frame_rate if frames is jump_frames else frame_rate))
+	delay(1 / frame_rate)
 
 
 running = True
@@ -121,17 +121,18 @@ while running:
 		elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
 			running = False
 
-	draw_frame(animations[animation_index], frame)
-	if animations[animation_index] is jump_frames and frame == frame_count - 1:
-		delay(2 / jump_frame_rate)
+	frames, frame_rate, final_frame_hold = animation_configs[animation_index]
+	draw_frame(frames, frame, frame_rate)
+	if frame == frame_count - 1:
+		delay(final_frame_hold / frame_rate)
 	frame += 1
 	if frame == frame_count:
 		frame = 0
 		animation_repeat += 1
 		if animation_repeat == animation_repeats:
 			animation_repeat = 0
-			animation_index = (animation_index + 1) % len(animations)
-			frame_count = len(animations[animation_index])
+			animation_index = (animation_index + 1) % len(animation_configs)
+			frame_count = len(animation_configs[animation_index][0])
 			delay(animation_pause)
 
 close_canvas()
