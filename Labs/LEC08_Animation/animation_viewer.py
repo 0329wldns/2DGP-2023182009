@@ -82,6 +82,10 @@ animations = [
 	spring_frames,
 	back_turn_frames,
 ]
+frame_rate = 24
+jump_frame_rate = 30
+animation_repeats = 5
+animation_pause = 1.0
 animation_index = 0
 frame_count = len(animations[animation_index])
 animation_repeat = 0
@@ -106,7 +110,7 @@ def draw_frame(frames, frame_index):
 		draw_height,
 	)
 	update_canvas()
-	delay(1 / 30 if frames is jump_frames else 1 / 24)
+	delay(1 / (jump_frame_rate if frames is jump_frames else frame_rate))
 
 
 running = True
@@ -119,15 +123,15 @@ while running:
 
 	draw_frame(animations[animation_index], frame)
 	if animations[animation_index] is jump_frames and frame == frame_count - 1:
-		delay(2 / 30)
+		delay(2 / jump_frame_rate)
 	frame += 1
 	if frame == frame_count:
 		frame = 0
 		animation_repeat += 1
-		if animation_repeat == 5:
+		if animation_repeat == animation_repeats:
 			animation_repeat = 0
 			animation_index = (animation_index + 1) % len(animations)
 			frame_count = len(animations[animation_index])
-			delay(1.0)
+			delay(animation_pause)
 
 close_canvas()
