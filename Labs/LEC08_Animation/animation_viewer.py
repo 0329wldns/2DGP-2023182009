@@ -63,7 +63,25 @@ spring_frames = [
 	(149, 154, 20, 41),
 ]
 
-animations = [walk_frames, kick_frames, jump_frames, run_frames, spring_frames]
+back_turn_frames = [
+	(1, 108, 27, 37),
+	(31, 110, 31, 35),
+	(64, 110, 31, 35),
+	(99, 110, 33, 35),
+	(136, 110, 32, 35),
+	(174, 110, 35, 35),
+	(217, 110, 33, 35),
+	(254, 111, 33, 34),
+]
+
+animations = [
+	walk_frames,
+	kick_frames,
+	jump_frames,
+	run_frames,
+	spring_frames,
+	back_turn_frames,
+]
 animation_index = 0
 frame_count = len(animations[animation_index])
 animation_repeat = 0
