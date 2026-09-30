@@ -77,7 +77,7 @@ def draw_frame(frames, frame_index):
 		frame_height * frame_scale,
 	)
 	update_canvas()
-	delay(0.12)
+	delay(1 / 24)
 
 
 running = True
