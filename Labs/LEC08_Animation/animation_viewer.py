@@ -12,8 +12,7 @@ sprite_sheet = load_image(str(Path(__file__).with_name('sonic-sprite.png')))
 frame_width = 133
 frame_height = 105
 frame_count = 3
-sheet_height = frame_height * 5
-second_row_y = sheet_height - frame_height * 3 // 2
+second_row_bottom = frame_height * 3
 frame = 0
 
 running = True
@@ -26,8 +25,8 @@ while running:
 
 	clear_canvas()
 	sprite_sheet.clip_draw(
-		frame * frame_width + frame_width // 2,
-		second_row_y,
+		frame * frame_width,
+		second_row_bottom,
 		frame_width,
 		frame_height,
 		screen_width // 2,
