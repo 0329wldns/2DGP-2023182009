@@ -27,6 +27,7 @@ SPRITE_SHEET_PATH = str(Path(__file__).with_name('sonic-sprite.png'))
 TARGET_SPRITE_HEIGHT = CANVAS_HEIGHT // 2
 
 sprite_sheet: Image | None = None
+Frame = tuple[int, int, int, int]
 
 # 동작별 프레임 정의: (left, bottom, width, height)
 walk_frames = [
@@ -129,7 +130,7 @@ FONT_CANDIDATES = [
 class AnimationState:
 	action_index: int
 	action_name: str
-	action_frames: list[tuple[int, int, int, int]]
+	action_frames: list[Frame]
 	frame_index: int
 	frame_timer: float
 	repeat: int
@@ -137,7 +138,7 @@ class AnimationState:
 	pause_timer: float
 
 
-def draw_frame(frames, frame_index):
+def draw_frame(frames: list[Frame], frame_index: int):
 	assert sprite_sheet is not None
 	left, bottom, width, height = frames[frame_index]
 	draw_height = max(1, round(height * SCALE))
@@ -149,7 +150,7 @@ def draw_frame(frames, frame_index):
 	)
 
 
-def load_hud_font(size=22):
+def load_hud_font(size: int = 22):
 	for path in FONT_CANDIDATES:
 		if os.path.exists(path):
 			try:
@@ -159,7 +160,7 @@ def load_hud_font(size=22):
 	return None
 
 
-def validate_frames(sheet_width, sheet_height):
+def validate_frames(sheet_width: int, sheet_height: int):
 	for action_name, frames in ACTIONS:
 		if not frames:
 			raise ValueError(f'{action_name} 동작에 프레임이 없습니다.')
@@ -177,7 +178,7 @@ def validate_frames(sheet_width, sheet_height):
 				)
 
 
-def draw_hud(font, action_name, frame_index, frame_total, repeat, phase):
+def draw_hud(font, action_name: str, frame_index: int, frame_total: int, repeat: int, phase: str):
 	if font is None:
 		return
 	# 정지 상태에서는 5회 반복이 끝난 직후이므로 5회로 표시한다
@@ -271,7 +272,8 @@ def main():
 
 		running = True
 		while running:
-			running = not should_close(get_events())
+			if should_close(get_events()):
+				break
 
 			update_state(state, get_time())
 			render(state, hud_font)
