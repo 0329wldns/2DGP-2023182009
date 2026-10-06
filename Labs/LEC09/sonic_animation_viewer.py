@@ -93,6 +93,10 @@ SCALE = TARGET_SPRITE_HEIGHT / MAX_FRAME_HEIGHT
 
 FRAME_RATE = 10  # 프레임 전환 속도(초당 프레임 수)
 REPEAT_COUNT = 5  # 동작당 반복 횟수
+PAUSE_TIME = 1.0  # 동작 간 정지 시간(초)
+
+PHASE_PLAY = 'play'
+PHASE_PAUSE = 'pause'
 
 
 def draw_frame(frames, frame_index):
@@ -117,6 +121,8 @@ def main():
 	frame_index = 0
 	frame_timer = get_time()
 	repeat = 0
+	phase = PHASE_PLAY
+	pause_timer = 0.0
 
 	running = True
 	while running:
@@ -127,16 +133,24 @@ def main():
 				running = False
 
 		now = get_time()
-		if now - frame_timer >= 1.0 / FRAME_RATE:
+		if phase == PHASE_PAUSE:
+			# 정지 상태: 마지막 프레임을 유지하고 1초 뒤 다음 동작으로 넘어간다
+			if now - pause_timer >= PAUSE_TIME:
+				repeat = 0
+				frame_index = 0
+				frame_timer = now
+				action_index = (action_index + 1) % len(ACTIONS)
+				action_name, action_frames = ACTIONS[action_index]
+				phase = PHASE_PLAY
+		elif now - frame_timer >= 1.0 / FRAME_RATE:
 			frame_timer = now
 			frame_index = (frame_index + 1) % len(action_frames)
 			if frame_index == 0:
 				repeat += 1
 				if repeat == REPEAT_COUNT:
-					# 마지막 동작 다음은 첫 동작으로 돌아온다
 					repeat = 0
-					action_index = (action_index + 1) % len(ACTIONS)
-					action_name, action_frames = ACTIONS[action_index]
+					phase = PHASE_PAUSE
+					pause_timer = now
 
 		clear_canvas()
 		draw_frame(action_frames, frame_index)
