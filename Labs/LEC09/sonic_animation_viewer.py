@@ -6,6 +6,9 @@ CANVAS_WIDTH = 800
 CANVAS_HEIGHT = 600
 SPRITE_SHEET_PATH = str(Path(__file__).with_name('sonic-sprite.png'))
 
+# 캔버스 높이의 절반 높이로 확대해 그린다 (원본 비율 유지)
+TARGET_SPRITE_HEIGHT = CANVAS_HEIGHT // 2
+
 sprite_sheet = None
 
 # 동작별 프레임 정의: (left, bottom, width, height)
@@ -84,13 +87,19 @@ ACTIONS = [
 	('back_turn', back_turn_frames),
 ]
 
+# 가장 큰 프레임 높이가 타깃 높이가 되도록 하는 확대 비율 (비율 유지)
+MAX_FRAME_HEIGHT = max(max(height for _, _, _, height in frames) for _, frames in ACTIONS)
+SCALE = TARGET_SPRITE_HEIGHT / MAX_FRAME_HEIGHT
+
 
 def draw_frame(frames, frame_index):
 	left, bottom, width, height = frames[frame_index]
+	draw_height = max(1, round(height * SCALE))
+	draw_width = max(1, round(width * SCALE))
 	sprite_sheet.clip_draw(
 		left, bottom, width, height,
 		CANVAS_WIDTH // 2, CANVAS_HEIGHT // 2,
-		width * 4, height * 4,
+		draw_width, draw_height,
 	)
 
 
