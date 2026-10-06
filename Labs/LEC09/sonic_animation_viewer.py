@@ -45,6 +45,45 @@ jump_frames = [
 	(267, 325, 31, 30),
 ]
 
+run_frames = [
+	(1, 207, 29, 33),
+	(36, 207, 30, 33),
+	(74, 208, 37, 31),
+	(123, 208, 39, 32),
+	(172, 208, 39, 31),
+	(218, 208, 38, 32),
+]
+
+spring_frames = [
+	(1, 154, 24, 41),
+	(31, 154, 29, 41),
+	(65, 154, 20, 41),
+	(90, 155, 25, 40),
+	(119, 155, 25, 40),
+	(149, 154, 20, 41),
+]
+
+back_turn_frames = [
+	(1, 108, 27, 37),
+	(31, 110, 31, 35),
+	(64, 110, 31, 35),
+	(99, 110, 33, 35),
+	(136, 110, 32, 35),
+	(174, 110, 35, 35),
+	(217, 110, 33, 35),
+	(254, 111, 33, 34),
+]
+
+# 재생 순서대로 나열한 동작 목록
+ACTIONS = [
+	('walk', walk_frames),
+	('kick', kick_frames),
+	('jump', jump_frames),
+	('run', run_frames),
+	('spring', spring_frames),
+	('back_turn', back_turn_frames),
+]
+
 
 def draw_frame(frames, frame_index):
 	left, bottom, width, height = frames[frame_index]
@@ -70,7 +109,7 @@ def main():
 				running = False
 
 		clear_canvas()
-		draw_frame(jump_frames, 0)
+		draw_frame(ACTIONS[0][1], 0)
 		update_canvas()
 		delay(0.1)
 
