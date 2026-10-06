@@ -24,9 +24,18 @@ walk_frames = [
 	(370, 409, 29, 38),
 ]
 
+kick_frames = [
+	(1, 361, 33, 40),
+	(39, 363, 35, 39),
+	(89, 363, 35, 38),
+	(129, 362, 35, 42),
+	(181, 363, 34, 41),
+	(225, 363, 36, 40),
+]
 
-def draw_frame(frame_index):
-	left, bottom, width, height = walk_frames[frame_index]
+
+def draw_frame(frames, frame_index):
+	left, bottom, width, height = frames[frame_index]
 	sprite_sheet.clip_draw(
 		left, bottom, width, height,
 		CANVAS_WIDTH // 2, CANVAS_HEIGHT // 2,
@@ -49,7 +58,7 @@ def main():
 				running = False
 
 		clear_canvas()
-		draw_frame(0)
+		draw_frame(kick_frames, 0)
 		update_canvas()
 		delay(0.1)
 
