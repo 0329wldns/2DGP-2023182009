@@ -1,5 +1,6 @@
 import os
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 from pico2d import (
@@ -124,6 +125,18 @@ FONT_CANDIDATES = [
 ]
 
 
+@dataclass
+class AnimationState:
+	action_index: int
+	action_name: str
+	action_frames: list[tuple[int, int, int, int]]
+	frame_index: int
+	frame_timer: float
+	repeat: int
+	phase: str
+	pause_timer: float
+
+
 def draw_frame(frames, frame_index):
 	assert sprite_sheet is not None
 	left, bottom, width, height = frames[frame_index]
@@ -173,41 +186,41 @@ def draw_hud(font, action_name, frame_index, frame_total, repeat, phase):
 	font.draw(20, CANVAS_HEIGHT - 30, text, (20, 20, 20))
 
 
-def update_state(state, now):
-	"""상태 기계를 한 번 갱신한다. state는 main()의 재생 상태 딕셔너리."""
-	if state['phase'] == PHASE_PAUSE:
+def update_state(state: AnimationState, now: float):
+	"""상태 기계를 한 번 갱신한다."""
+	if state.phase == PHASE_PAUSE:
 		# 정지 상태: 마지막 프레임을 유지하고 1초 뒤 다음 동작으로 넘어간다
-		if now - state['pause_timer'] >= PAUSE_TIME:
-			state['repeat'] = 0
-			state['frame_index'] = 0
-			state['frame_timer'] = now
-			state['action_index'] = (state['action_index'] + 1) % len(ACTIONS)
-			state['action_name'], state['action_frames'] = ACTIONS[state['action_index']]
-			state['phase'] = PHASE_PLAY
+		if now - state.pause_timer >= PAUSE_TIME:
+			state.repeat = 0
+			state.frame_index = 0
+			state.frame_timer = now
+			state.action_index = (state.action_index + 1) % len(ACTIONS)
+			state.action_name, state.action_frames = ACTIONS[state.action_index]
+			state.phase = PHASE_PLAY
 		return
 
-	while now - state['frame_timer'] >= FRAME_TIME:
-		state['frame_timer'] += FRAME_TIME
-		state['frame_index'] = (state['frame_index'] + 1) % len(state['action_frames'])
-		if state['frame_index'] == 0:
-			state['repeat'] += 1
-			if state['repeat'] == REPEAT_COUNT:
-				state['repeat'] = 0
-				state['phase'] = PHASE_PAUSE
-				state['pause_timer'] = now
+	while now - state.frame_timer >= FRAME_TIME:
+		state.frame_timer += FRAME_TIME
+		state.frame_index = (state.frame_index + 1) % len(state.action_frames)
+		if state.frame_index == 0:
+			state.repeat += 1
+			if state.repeat == REPEAT_COUNT:
+				state.repeat = 0
+				state.phase = PHASE_PAUSE
+				state.pause_timer = now
 				return
 
 
-def render(state, hud_font):
+def render(state: AnimationState, hud_font):
 	clear_canvas()
-	draw_frame(state['action_frames'], state['frame_index'])
+	draw_frame(state.action_frames, state.frame_index)
 	draw_hud(
 		hud_font,
-		state['action_name'],
-		state['frame_index'],
-		len(state['action_frames']),
-		state['repeat'],
-		state['phase'],
+		state.action_name,
+		state.frame_index,
+		len(state.action_frames),
+		state.repeat,
+		state.phase,
 	)
 	update_canvas()
 
@@ -232,16 +245,16 @@ def main():
 
 		hud_font = load_hud_font()
 		action_name, action_frames = ACTIONS[0]
-		state = {
-			'action_index': 0,
-			'action_name': action_name,
-			'action_frames': action_frames,
-			'frame_index': 0,
-			'frame_timer': get_time(),
-			'repeat': 0,
-			'phase': PHASE_PLAY,
-			'pause_timer': 0.0,
-		}
+		state = AnimationState(
+			action_index=0,
+			action_name=action_name,
+			action_frames=action_frames,
+			frame_index=0,
+			frame_timer=get_time(),
+			repeat=0,
+			phase=PHASE_PLAY,
+			pause_timer=0.0,
+		)
 
 		running = True
 		while running:
