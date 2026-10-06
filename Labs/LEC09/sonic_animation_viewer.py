@@ -225,6 +225,29 @@ def render(state: AnimationState, hud_font):
 	update_canvas()
 
 
+def create_initial_state(now: float) -> AnimationState:
+	action_name, action_frames = ACTIONS[0]
+	return AnimationState(
+		action_index=0,
+		action_name=action_name,
+		action_frames=action_frames,
+		frame_index=0,
+		frame_timer=now,
+		repeat=0,
+		phase=PHASE_PLAY,
+		pause_timer=0.0,
+	)
+
+
+def should_close(events) -> bool:
+	for event in events:
+		if event.type == SDL_QUIT:
+			return True
+		if event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
+			return True
+	return False
+
+
 def main():
 	global sprite_sheet
 
@@ -244,25 +267,11 @@ def main():
 			return
 
 		hud_font = load_hud_font()
-		action_name, action_frames = ACTIONS[0]
-		state = AnimationState(
-			action_index=0,
-			action_name=action_name,
-			action_frames=action_frames,
-			frame_index=0,
-			frame_timer=get_time(),
-			repeat=0,
-			phase=PHASE_PLAY,
-			pause_timer=0.0,
-		)
+		state = create_initial_state(get_time())
 
 		running = True
 		while running:
-			for event in get_events():
-				if event.type == SDL_QUIT:
-					running = False
-				elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-					running = False
+			running = not should_close(get_events())
 
 			update_state(state, get_time())
 			render(state, hud_font)
