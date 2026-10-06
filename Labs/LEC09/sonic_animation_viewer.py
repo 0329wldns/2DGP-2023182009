@@ -23,6 +23,11 @@ def main():
 			elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
 				running = False
 
+		clear_canvas()
+		sprite_sheet.draw(CANVAS_WIDTH // 2, CANVAS_HEIGHT // 2)
+		update_canvas()
+		delay(0.1)
+
 	close_canvas()
 
 
