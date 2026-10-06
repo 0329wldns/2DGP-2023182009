@@ -111,6 +111,7 @@ MAX_FRAME_HEIGHT = max(max(height for _, _, _, height in frames) for _, frames i
 SCALE = TARGET_SPRITE_HEIGHT / MAX_FRAME_HEIGHT
 
 FRAME_TIME = 0.1  # 프레임 간격(초)
+TIME_EPSILON = 1e-9
 REPEAT_COUNT = 5  # 동작당 반복 횟수
 PAUSE_TIME = 1.0  # 동작 간 정지 시간(초)
 
@@ -186,6 +187,15 @@ def validate_scale():
 		raise ValueError('확대된 프레임 높이는 캔버스 높이의 절반을 넘을 수 없습니다.')
 
 
+def advance_to_next_action(state: AnimationState, now: float):
+	state.repeat = 0
+	state.frame_index = 0
+	state.frame_timer = now
+	state.action_index = (state.action_index + 1) % len(ACTIONS)
+	state.action_name, state.action_frames = ACTIONS[state.action_index]
+	state.phase = PHASE_PLAY
+
+
 def draw_hud(font, action_name: str, frame_index: int, frame_total: int, repeat: int, phase: str):
 	if font is None:
 		return
@@ -200,15 +210,10 @@ def update_state(state: AnimationState, now: float):
 	if state.phase == PHASE_PAUSE:
 		# 정지 상태: 마지막 프레임을 유지하고 1초 뒤 다음 동작으로 넘어간다
 		if now - state.pause_timer >= PAUSE_TIME:
-			state.repeat = 0
-			state.frame_index = 0
-			state.frame_timer = now
-			state.action_index = (state.action_index + 1) % len(ACTIONS)
-			state.action_name, state.action_frames = ACTIONS[state.action_index]
-			state.phase = PHASE_PLAY
+			advance_to_next_action(state, now)
 		return
 
-	while now - state.frame_timer >= FRAME_TIME:
+	while now - state.frame_timer + TIME_EPSILON >= FRAME_TIME:
 		state.frame_timer += FRAME_TIME
 		state.frame_index = (state.frame_index + 1) % len(state.action_frames)
 		if state.frame_index == 0:
