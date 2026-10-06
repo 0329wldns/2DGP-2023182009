@@ -112,7 +112,8 @@ def main():
 	open_canvas(CANVAS_WIDTH, CANVAS_HEIGHT)
 	sprite_sheet = load_image(SPRITE_SHEET_PATH)
 
-	action_name, action_frames = ACTIONS[0]
+	action_index = 0
+	action_name, action_frames = ACTIONS[action_index]
 	frame_index = 0
 	frame_timer = get_time()
 	repeat = 0
@@ -132,7 +133,10 @@ def main():
 			if frame_index == 0:
 				repeat += 1
 				if repeat == REPEAT_COUNT:
+					# 마지막 동작 다음은 첫 동작으로 돌아온다
 					repeat = 0
+					action_index = (action_index + 1) % len(ACTIONS)
+					action_name, action_frames = ACTIONS[action_index]
 
 		clear_canvas()
 		draw_frame(action_frames, frame_index)
