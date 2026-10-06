@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from pico2d import *
@@ -98,6 +99,15 @@ PAUSE_TIME = 1.0  # 동작 간 정지 시간(초)
 PHASE_PLAY = 'play'
 PHASE_PAUSE = 'pause'
 
+PHASE_LABELS = {PHASE_PLAY: 'PLAY', PHASE_PAUSE: 'PAUSE'}
+
+# 화면에 상태를 찍을 폰트 후보 (운영체제별 폰트 경로)
+FONT_CANDIDATES = [
+	r'C:\Windows\Fonts\malgun.ttf',
+	r'C:\Windows\Fonts\arial.ttf',
+	'/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+]
+
 
 def draw_frame(frames, frame_index):
 	left, bottom, width, height = frames[frame_index]
@@ -110,11 +120,28 @@ def draw_frame(frames, frame_index):
 	)
 
 
+def load_hud_font(size=22):
+	for path in FONT_CANDIDATES:
+		if os.path.exists(path):
+			return load_font(path, size)
+	return None
+
+
+def draw_hud(font, action_name, frame_index, frame_total, repeat, phase):
+	if font is None:
+		return
+	# 정지 상태에서는 5회 반복이 끝난 직후이므로 5회로 표시한다
+	shown_repeat = REPEAT_COUNT if phase == PHASE_PAUSE else repeat + 1
+	text = f'{action_name}  frame {frame_index + 1}/{frame_total}  repeat {shown_repeat}/{REPEAT_COUNT}  [{PHASE_LABELS[phase]}]'
+	font.draw(20, CANVAS_HEIGHT - 30, text, (20, 20, 20))
+
+
 def main():
 	global sprite_sheet
 
 	open_canvas(CANVAS_WIDTH, CANVAS_HEIGHT)
 	sprite_sheet = load_image(SPRITE_SHEET_PATH)
+	hud_font = load_hud_font()
 
 	action_index = 0
 	action_name, action_frames = ACTIONS[action_index]
@@ -154,6 +181,7 @@ def main():
 
 		clear_canvas()
 		draw_frame(action_frames, frame_index)
+		draw_hud(hud_font, action_name, frame_index, len(action_frames), repeat, phase)
 		update_canvas()
 		delay(0.05)
 
