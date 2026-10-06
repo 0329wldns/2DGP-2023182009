@@ -91,6 +91,8 @@ ACTIONS = [
 MAX_FRAME_HEIGHT = max(max(height for _, _, _, height in frames) for _, frames in ACTIONS)
 SCALE = TARGET_SPRITE_HEIGHT / MAX_FRAME_HEIGHT
 
+FRAME_RATE = 10  # 프레임 전환 속도(초당 프레임 수)
+
 
 def draw_frame(frames, frame_index):
 	left, bottom, width, height = frames[frame_index]
@@ -109,6 +111,10 @@ def main():
 	open_canvas(CANVAS_WIDTH, CANVAS_HEIGHT)
 	sprite_sheet = load_image(SPRITE_SHEET_PATH)
 
+	action_name, action_frames = ACTIONS[0]
+	frame_index = 0
+	frame_timer = get_time()
+
 	running = True
 	while running:
 		for event in get_events():
@@ -117,10 +123,15 @@ def main():
 			elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
 				running = False
 
+		now = get_time()
+		if now - frame_timer >= 1.0 / FRAME_RATE:
+			frame_timer = now
+			frame_index = (frame_index + 1) % len(action_frames)
+
 		clear_canvas()
-		draw_frame(ACTIONS[0][1], 0)
+		draw_frame(action_frames, frame_index)
 		update_canvas()
-		delay(0.1)
+		delay(0.05)
 
 	close_canvas()
 
