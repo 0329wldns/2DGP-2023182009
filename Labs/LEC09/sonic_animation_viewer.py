@@ -106,6 +106,12 @@ ACTIONS = [
 	('back_turn', back_turn_frames),
 ]
 
+# 이동 동작의 초당 이동 거리. 10 FPS 프레임 간격마다 같은 거리만큼 전진한다.
+MOVEMENT_SPEEDS = {
+	'walk': 45.0,
+	'run': 100.0,
+}
+
 # 가장 큰 프레임 높이가 타깃 높이가 되도록 하는 확대 비율 (비율 유지)
 MAX_FRAME_HEIGHT = max(max(height for _, _, _, height in frames) for _, frames in ACTIONS)
 SCALE = TARGET_SPRITE_HEIGHT / MAX_FRAME_HEIGHT
@@ -138,16 +144,19 @@ class AnimationState:
 	repeat: int
 	phase: str
 	pause_timer: float
+	x: float
+	direction: int
 
 
-def draw_frame(frames: list[Frame], frame_index: int):
+def draw_frame(frames: list[Frame], frame_index: int, x: float, direction: int):
 	assert sprite_sheet is not None
 	left, bottom, width, height = frames[frame_index]
 	draw_height = max(1, round(height * SCALE))
 	draw_width = max(1, round(width * SCALE))
-	sprite_sheet.clip_draw(
+	sprite_sheet.clip_composite_draw(
 		left, bottom, width, height,
-		CANVAS_WIDTH // 2, CANVAS_HEIGHT // 2,
+		0, 'h' if direction < 0 else '',
+		x, CANVAS_HEIGHT // 2,
 		draw_width, draw_height,
 	)
 
@@ -187,6 +196,15 @@ def validate_scale():
 		raise ValueError('확대된 프레임 높이는 캔버스 높이의 절반을 넘을 수 없습니다.')
 
 
+def validate_movement():
+	unknown_actions = set(MOVEMENT_SPEEDS) - {name for name, _ in ACTIONS}
+	if unknown_actions:
+		names = ', '.join(sorted(unknown_actions))
+		raise ValueError(f'이동 속도가 정의되지 않은 동작이 있습니다: {names}')
+	if any(speed < 0 for speed in MOVEMENT_SPEEDS.values()):
+		raise ValueError('이동 속도는 음수가 될 수 없습니다.')
+
+
 def advance_to_next_action(state: AnimationState, now: float):
 	state.repeat = 0
 	state.frame_index = 0
@@ -215,7 +233,16 @@ def update_state(state: AnimationState, now: float):
 
 	while now - state.frame_timer + TIME_EPSILON >= FRAME_TIME:
 		state.frame_timer += FRAME_TIME
+		state.x += MOVEMENT_SPEEDS.get(state.action_name, 0.0) * FRAME_TIME * state.direction
 		state.frame_index = (state.frame_index + 1) % len(state.action_frames)
+		frame_width = state.action_frames[state.frame_index][2] * SCALE
+		half_width = frame_width / 2
+		if state.x + half_width >= CANVAS_WIDTH:
+			state.x = CANVAS_WIDTH - half_width
+			state.direction = -1
+		elif state.x - half_width <= 0:
+			state.x = half_width
+			state.direction = 1
 		if state.frame_index == 0:
 			state.repeat += 1
 			if state.repeat == REPEAT_COUNT:
@@ -227,7 +254,7 @@ def update_state(state: AnimationState, now: float):
 
 def render(state: AnimationState, hud_font):
 	clear_canvas()
-	draw_frame(state.action_frames, state.frame_index)
+	draw_frame(state.action_frames, state.frame_index, state.x, state.direction)
 	draw_hud(
 		hud_font,
 		state.action_name,
@@ -250,6 +277,8 @@ def create_initial_state(now: float) -> AnimationState:
 		repeat=0,
 		phase=PHASE_PLAY,
 		pause_timer=0.0,
+		x=CANVAS_WIDTH / 2,
+		direction=1,
 	)
 
 
@@ -277,6 +306,7 @@ def main():
 		try:
 			validate_frames(sprite_sheet.w, sprite_sheet.h)
 			validate_scale()
+			validate_movement()
 		except ValueError as error:
 			print(f'프레임 정의 오류: {error}', file=sys.stderr)
 			return
