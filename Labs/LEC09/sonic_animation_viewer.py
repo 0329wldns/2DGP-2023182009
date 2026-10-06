@@ -25,6 +25,7 @@ SPRITE_SHEET_PATH = str(Path(__file__).with_name('sonic-sprite.png'))
 
 # 캔버스 높이의 절반 높이로 확대해 그린다 (원본 비율 유지)
 TARGET_SPRITE_HEIGHT = CANVAS_HEIGHT // 2
+MIN_SCALE = 2.0
 
 sprite_sheet: Image | None = None
 Frame = tuple[int, int, int, int]
@@ -178,6 +179,13 @@ def validate_frames(sheet_width: int, sheet_height: int):
 				)
 
 
+def validate_scale():
+	if SCALE < MIN_SCALE:
+		raise ValueError('프레임 확대 배율은 원본의 2배 이상이어야 합니다.')
+	if SCALE * MAX_FRAME_HEIGHT > CANVAS_HEIGHT / 2:
+		raise ValueError('확대된 프레임 높이는 캔버스 높이의 절반을 넘을 수 없습니다.')
+
+
 def draw_hud(font, action_name: str, frame_index: int, frame_total: int, repeat: int, phase: str):
 	if font is None:
 		return
@@ -263,6 +271,7 @@ def main():
 
 		try:
 			validate_frames(sprite_sheet.w, sprite_sheet.h)
+			validate_scale()
 		except ValueError as error:
 			print(f'프레임 정의 오류: {error}', file=sys.stderr)
 			return
