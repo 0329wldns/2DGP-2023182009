@@ -33,6 +33,18 @@ kick_frames = [
 	(225, 363, 36, 40),
 ]
 
+jump_frames = [
+	(1, 326, 29, 30),
+	(35, 327, 29, 31),
+	(67, 327, 30, 29),
+	(98, 327, 31, 29),
+	(131, 327, 29, 30),
+	(162, 326, 29, 31),
+	(193, 326, 30, 29),
+	(229, 326, 32, 29),
+	(267, 325, 31, 30),
+]
+
 
 def draw_frame(frames, frame_index):
 	left, bottom, width, height = frames[frame_index]
@@ -58,7 +70,7 @@ def main():
 				running = False
 
 		clear_canvas()
-		draw_frame(kick_frames, 0)
+		draw_frame(jump_frames, 0)
 		update_canvas()
 		delay(0.1)
 
