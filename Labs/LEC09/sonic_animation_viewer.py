@@ -1,7 +1,22 @@
 import os
+import sys
 from pathlib import Path
 
-from pico2d import *
+from pico2d import (
+	SDL_KEYDOWN,
+	SDL_QUIT,
+	SDLK_ESCAPE,
+	Image,
+	clear_canvas,
+	close_canvas,
+	delay,
+	get_events,
+	get_time,
+	load_font,
+	load_image,
+	open_canvas,
+	update_canvas,
+)
 
 CANVAS_WIDTH = 800
 CANVAS_HEIGHT = 600
@@ -10,7 +25,7 @@ SPRITE_SHEET_PATH = str(Path(__file__).with_name('sonic-sprite.png'))
 # 캔버스 높이의 절반 높이로 확대해 그린다 (원본 비율 유지)
 TARGET_SPRITE_HEIGHT = CANVAS_HEIGHT // 2
 
-sprite_sheet = None
+sprite_sheet: Image | None = None
 
 # 동작별 프레임 정의: (left, bottom, width, height)
 walk_frames = [
@@ -110,6 +125,7 @@ FONT_CANDIDATES = [
 
 
 def draw_frame(frames, frame_index):
+	assert sprite_sheet is not None
 	left, bottom, width, height = frames[frame_index]
 	draw_height = max(1, round(height * SCALE))
 	draw_width = max(1, round(width * SCALE))
@@ -123,8 +139,29 @@ def draw_frame(frames, frame_index):
 def load_hud_font(size=22):
 	for path in FONT_CANDIDATES:
 		if os.path.exists(path):
-			return load_font(path, size)
+			try:
+				return load_font(path, size)
+			except OSError:
+				continue
 	return None
+
+
+def validate_frames(sheet_width, sheet_height):
+	for action_name, frames in ACTIONS:
+		if not frames:
+			raise ValueError(f'{action_name} 동작에 프레임이 없습니다.')
+		for frame_index, (left, bottom, width, height) in enumerate(frames):
+			if (
+				left < 0
+				or bottom < 0
+				or width <= 0
+				or height <= 0
+				or left + width > sheet_width
+				or bottom + height > sheet_height
+			):
+				raise ValueError(
+					f'{action_name} 프레임 {frame_index}가 스프라이트 시트 범위를 벗어났습니다.'
+				)
 
 
 def draw_hud(font, action_name, frame_index, frame_total, repeat, phase):
@@ -136,56 +173,90 @@ def draw_hud(font, action_name, frame_index, frame_total, repeat, phase):
 	font.draw(20, CANVAS_HEIGHT - 30, text, (20, 20, 20))
 
 
+def update_state(state, now):
+	"""상태 기계를 한 번 갱신한다. state는 main()의 재생 상태 딕셔너리."""
+	if state['phase'] == PHASE_PAUSE:
+		# 정지 상태: 마지막 프레임을 유지하고 1초 뒤 다음 동작으로 넘어간다
+		if now - state['pause_timer'] >= PAUSE_TIME:
+			state['repeat'] = 0
+			state['frame_index'] = 0
+			state['frame_timer'] = now
+			state['action_index'] = (state['action_index'] + 1) % len(ACTIONS)
+			state['action_name'], state['action_frames'] = ACTIONS[state['action_index']]
+			state['phase'] = PHASE_PLAY
+		return
+
+	frame_interval = 1.0 / FRAME_RATE
+	while now - state['frame_timer'] >= frame_interval:
+		state['frame_timer'] += frame_interval
+		state['frame_index'] = (state['frame_index'] + 1) % len(state['action_frames'])
+		if state['frame_index'] == 0:
+			state['repeat'] += 1
+			if state['repeat'] == REPEAT_COUNT:
+				state['repeat'] = 0
+				state['phase'] = PHASE_PAUSE
+				state['pause_timer'] = now
+				return
+
+
+def render(state, hud_font):
+	clear_canvas()
+	draw_frame(state['action_frames'], state['frame_index'])
+	draw_hud(
+		hud_font,
+		state['action_name'],
+		state['frame_index'],
+		len(state['action_frames']),
+		state['repeat'],
+		state['phase'],
+	)
+	update_canvas()
+
+
 def main():
 	global sprite_sheet
 
 	open_canvas(CANVAS_WIDTH, CANVAS_HEIGHT)
-	sprite_sheet = load_image(SPRITE_SHEET_PATH)
-	hud_font = load_hud_font()
+	try:
+		try:
+			sprite_sheet = load_image(SPRITE_SHEET_PATH)
+		except OSError as error:
+			print(f'스프라이트를 불러올 수 없습니다: {SPRITE_SHEET_PATH}', file=sys.stderr)
+			print(error, file=sys.stderr)
+			return
 
-	action_index = 0
-	action_name, action_frames = ACTIONS[action_index]
-	frame_index = 0
-	frame_timer = get_time()
-	repeat = 0
-	phase = PHASE_PLAY
-	pause_timer = 0.0
+		try:
+			validate_frames(sprite_sheet.w, sprite_sheet.h)
+		except ValueError as error:
+			print(f'프레임 정의 오류: {error}', file=sys.stderr)
+			return
 
-	running = True
-	while running:
-		for event in get_events():
-			if event.type == SDL_QUIT:
-				running = False
-			elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-				running = False
+		hud_font = load_hud_font()
+		action_name, action_frames = ACTIONS[0]
+		state = {
+			'action_index': 0,
+			'action_name': action_name,
+			'action_frames': action_frames,
+			'frame_index': 0,
+			'frame_timer': get_time(),
+			'repeat': 0,
+			'phase': PHASE_PLAY,
+			'pause_timer': 0.0,
+		}
 
-		now = get_time()
-		if phase == PHASE_PAUSE:
-			# 정지 상태: 마지막 프레임을 유지하고 1초 뒤 다음 동작으로 넘어간다
-			if now - pause_timer >= PAUSE_TIME:
-				repeat = 0
-				frame_index = 0
-				frame_timer = now
-				action_index = (action_index + 1) % len(ACTIONS)
-				action_name, action_frames = ACTIONS[action_index]
-				phase = PHASE_PLAY
-		elif now - frame_timer >= 1.0 / FRAME_RATE:
-			frame_timer = now
-			frame_index = (frame_index + 1) % len(action_frames)
-			if frame_index == 0:
-				repeat += 1
-				if repeat == REPEAT_COUNT:
-					repeat = 0
-					phase = PHASE_PAUSE
-					pause_timer = now
+		running = True
+		while running:
+			for event in get_events():
+				if event.type == SDL_QUIT:
+					running = False
+				elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
+					running = False
 
-		clear_canvas()
-		draw_frame(action_frames, frame_index)
-		draw_hud(hud_font, action_name, frame_index, len(action_frames), repeat, phase)
-		update_canvas()
-		delay(0.05)
-
-	close_canvas()
+			update_state(state, get_time())
+			render(state, hud_font)
+			delay(1.0 / 60.0)
+	finally:
+		close_canvas()
 
 
 if __name__ == '__main__':
