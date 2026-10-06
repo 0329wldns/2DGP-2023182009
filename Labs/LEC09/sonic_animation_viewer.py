@@ -107,7 +107,7 @@ ACTIONS = [
 MAX_FRAME_HEIGHT = max(max(height for _, _, _, height in frames) for _, frames in ACTIONS)
 SCALE = TARGET_SPRITE_HEIGHT / MAX_FRAME_HEIGHT
 
-FRAME_RATE = 10  # 프레임 전환 속도(초당 프레임 수)
+FRAME_TIME = 0.1  # 프레임 간격(초)
 REPEAT_COUNT = 5  # 동작당 반복 횟수
 PAUSE_TIME = 1.0  # 동작 간 정지 시간(초)
 
@@ -186,9 +186,8 @@ def update_state(state, now):
 			state['phase'] = PHASE_PLAY
 		return
 
-	frame_interval = 1.0 / FRAME_RATE
-	while now - state['frame_timer'] >= frame_interval:
-		state['frame_timer'] += frame_interval
+	while now - state['frame_timer'] >= FRAME_TIME:
+		state['frame_timer'] += FRAME_TIME
 		state['frame_index'] = (state['frame_index'] + 1) % len(state['action_frames'])
 		if state['frame_index'] == 0:
 			state['repeat'] += 1
