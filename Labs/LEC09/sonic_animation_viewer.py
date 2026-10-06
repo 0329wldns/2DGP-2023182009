@@ -92,6 +92,7 @@ MAX_FRAME_HEIGHT = max(max(height for _, _, _, height in frames) for _, frames i
 SCALE = TARGET_SPRITE_HEIGHT / MAX_FRAME_HEIGHT
 
 FRAME_RATE = 10  # 프레임 전환 속도(초당 프레임 수)
+REPEAT_COUNT = 5  # 동작당 반복 횟수
 
 
 def draw_frame(frames, frame_index):
@@ -114,6 +115,7 @@ def main():
 	action_name, action_frames = ACTIONS[0]
 	frame_index = 0
 	frame_timer = get_time()
+	repeat = 0
 
 	running = True
 	while running:
@@ -127,6 +129,10 @@ def main():
 		if now - frame_timer >= 1.0 / FRAME_RATE:
 			frame_timer = now
 			frame_index = (frame_index + 1) % len(action_frames)
+			if frame_index == 0:
+				repeat += 1
+				if repeat == REPEAT_COUNT:
+					repeat = 0
 
 		clear_canvas()
 		draw_frame(action_frames, frame_index)
